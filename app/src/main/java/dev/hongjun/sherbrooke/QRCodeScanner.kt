@@ -9,7 +9,7 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import dev.hongjun.sherbrooke.ui.theme.ProjetSherbrookeTheme
 
-class QRCodeScannerActivity : ComponentActivity() {
+class QRCodeScanner : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
