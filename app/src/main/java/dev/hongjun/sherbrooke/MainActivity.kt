@@ -1,10 +1,14 @@
 package dev.hongjun.sherbrooke
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -12,6 +16,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -21,9 +26,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import dev.hongjun.sherbrooke.ui.theme.ProjetSherbrookeTheme
 
-import dev.hongjun.sherbrooke.QRCodeConverter
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,11 +109,32 @@ fun MyProfile(navController: NavController) {
     Text(text = "My Profile")
     val bitmap = QRCodeConverter.generateQRCodeFromString("Sample Text")
     Image(painter = rememberImagePainter(bitmap) , contentDescription = null)
+
 }
 
 @Composable
 fun Scan(navController: NavController) {
-    Text(text = "Scan")
+
+
+    val context = LocalContext.current
+    val barcodeLauncher: ActivityResultLauncher<ScanOptions> = rememberLauncherForActivityResult(
+        ScanContract()
+    ) { result ->
+        if (result.getContents() == null) {
+            Toast.makeText(context, "Cancelled", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(context, "Scanned: " + result.getContents(), Toast.LENGTH_LONG)
+                .show()
+        }
+    }
+    Column() {
+        Text(text = "Scan")
+        Button(onClick = { barcodeLauncher.launch(ScanOptions()) }) {
+            Text("Scanner")
+        }
+    }
+
+
 }
 
 @Composable
