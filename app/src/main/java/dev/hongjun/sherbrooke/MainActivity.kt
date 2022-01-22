@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -19,7 +20,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 import dev.hongjun.sherbrooke.ui.theme.ProjetSherbrookeTheme
+
+import dev.hongjun.sherbrooke.QRCodeConverter
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,6 +101,8 @@ sealed class Screen(val route: String, @StringRes val resourceId: Int) {
 @Composable
 fun MyProfile(navController: NavController) {
     Text(text = "My Profile")
+    val bitmap = QRCodeConverter.generateQRCodeFromString("Sample Text")
+    Image(painter = rememberImagePainter(bitmap) , contentDescription = null)
 }
 
 @Composable
