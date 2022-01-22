@@ -18,10 +18,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -33,7 +33,6 @@ import coil.compose.rememberImagePainter
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import dev.hongjun.sherbrooke.ui.theme.ProjetSherbrookeTheme
-import kotlinx.serialization.Serializable
 
 
 class MainActivity : ComponentActivity() {
@@ -109,21 +108,29 @@ sealed class Screen(val route: String, @StringRes val resourceId: Int) {
     object History : Screen("history", R.string.history)
 }
 
+private val dummyUserInfo = UserInfo(
+    name = Name("First", "Last"),
+    email = Email("first.last@example.com"),
+    phoneNumber = PhoneNumber("123-456-7890"),
+    socialNetworks = SocialNetworks(
+        discordTag = DiscordTag("tomato#0001"),
+        instagramUsername = "tomato",
+    ),
+    notes = "Notes"
+)
+
 @Composable
 fun MyProfile(navController: NavController) {
+    val context = LocalContext.current
+    val profile = getUserProfile(context) ?: run {
+        setUserProfile(context, dummyUserInfo)
+        Toast.makeText(context, "User profile is null", Toast.LENGTH_LONG).show()
+        dummyUserInfo
+    }
 
     val bitmap = QRCodeConverter.generateQRCodeFromString(
-        toJson<UserInfo>(
-            UserInfo(
-                name = Name("First", "Last"),
-                email = Email("first.last@example.com"),
-                phoneNumber = PhoneNumber("123-456-7890"),
-                socialNetworks = SocialNetworks(
-                    discordTag = DiscordTag("tomato#0001"),
-                    instagramUsername = "tomato",
-                ),
-                notes = "Notes"
-            )
+        toJson(
+            profile
         )
     )
     Column(
@@ -131,7 +138,7 @@ fun MyProfile(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "My Profile", modifier = Modifier.padding(16.dp))
+        Text(text = profile.name.toString(), modifier = Modifier.padding(16.dp), fontSize = 30.sp)
         Image(
             painter = rememberImagePainter(bitmap), contentDescription = null, modifier = Modifier
                 .clip(shape = RoundedCornerShape(16.dp))
@@ -139,15 +146,11 @@ fun MyProfile(navController: NavController) {
                 .fillMaxSize()
                 .padding(16.dp)
         )
-
     }
-
 }
 
 @Composable
 fun Scan(navController: NavController) {
-
-
     val context = LocalContext.current
     val barcodeLauncher: ActivityResultLauncher<ScanOptions> = rememberLauncherForActivityResult(
         ScanContract()
@@ -178,21 +181,30 @@ fun Scan(navController: NavController) {
             Text("Scanner")
         }
     }
-
-
 }
 
 // TODO: write new composable function to display user info and save to history
+// TODO : A list of saved profiles, pour voir le profil, cliquez on the profile
 @Composable
 fun History(navController: NavController) {
-
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
+    ) {
         Text(text = "History")
     }
+}
+
+// TODO : edits the saved user profile
+@Composable
+fun UserProfileEditor(navController: NavController) {
+
+}
+
+// TODO : shows user info
+@Composable
+fun ProfileViewer(navController: NavController, userInfo: UserInfo) {
 
 }
 
