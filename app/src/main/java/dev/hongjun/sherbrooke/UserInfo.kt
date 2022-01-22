@@ -2,6 +2,7 @@ package dev.hongjun.sherbrooke
 
 import android.text.TextUtils
 import android.util.Patterns
+import kotlinx.serialization.Serializable
 import java.lang.Character.isDigit
 
 fun isValidEmail(target: String): Boolean {
@@ -9,6 +10,7 @@ fun isValidEmail(target: String): Boolean {
 }
 
 @JvmInline
+@Serializable
 value class Email(private val value: String) {
     init {
         require(isValidEmail(value))
@@ -19,6 +21,7 @@ value class Email(private val value: String) {
     }
 }
 
+@Serializable
 data class Name(val first: String, val last: String) {
     init {
         require(first.isNotEmpty())
@@ -67,6 +70,7 @@ fun formatNorthAmericanPhoneNumber(value: String): String {
 }
 
 @JvmInline
+@Serializable
 value class PhoneNumber(private val value: String) {
     init {
         requireNorthAmericanPhoneNumber(value)
@@ -78,6 +82,7 @@ value class PhoneNumber(private val value: String) {
 }
 
 @JvmInline
+@Serializable
 value class DiscordTag(private val value: String) {
     init {
         // _____...___#XXXX
@@ -110,10 +115,12 @@ value class DiscordTag(private val value: String) {
     }
 }
 
+@Serializable
 data class SocialNetworks(val discordTag: DiscordTag?, val instagramUsername: String?)
 
+@Serializable
 data class UserInfo(
-    val name: String,
+    val name: Name,
     val email: Email,
     val phoneNumber: PhoneNumber,
     val socialNetworks: SocialNetworks,
