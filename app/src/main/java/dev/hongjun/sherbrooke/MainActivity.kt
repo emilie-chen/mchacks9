@@ -8,16 +8,20 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -29,6 +33,7 @@ import coil.compose.rememberImagePainter
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import dev.hongjun.sherbrooke.ui.theme.ProjetSherbrookeTheme
+import kotlinx.serialization.Serializable
 
 
 class MainActivity : ComponentActivity() {
@@ -106,9 +111,36 @@ sealed class Screen(val route: String, @StringRes val resourceId: Int) {
 
 @Composable
 fun MyProfile(navController: NavController) {
-    Text(text = "My Profile")
-    val bitmap = QRCodeConverter.generateQRCodeFromString("Sample Text")
-    Image(painter = rememberImagePainter(bitmap) , contentDescription = null)
+
+    val bitmap = QRCodeConverter.generateQRCodeFromString(
+        toJson<UserInfo>(
+            UserInfo(
+                name = Name("First", "Last"),
+                email = Email("first.last@example.com"),
+                phoneNumber = PhoneNumber("123-456-7890"),
+                socialNetworks = SocialNetworks(
+                    discordTag = DiscordTag("tomato#0001"),
+                    instagramUsername = "tomato",
+                ),
+                notes = "Notes"
+            )
+        )
+    )
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "My Profile", modifier = Modifier.padding(16.dp))
+        Image(
+            painter = rememberImagePainter(bitmap), contentDescription = null, modifier = Modifier
+                .clip(shape = RoundedCornerShape(16.dp))
+                .height(300.dp)
+                .fillMaxSize()
+                .padding(16.dp)
+        )
+
+    }
 
 }
 
@@ -120,14 +152,27 @@ fun Scan(navController: NavController) {
     val barcodeLauncher: ActivityResultLauncher<ScanOptions> = rememberLauncherForActivityResult(
         ScanContract()
     ) { result ->
-        if (result.getContents() == null) {
+        if (result.contents == null) {
             Toast.makeText(context, "Cancelled", Toast.LENGTH_LONG).show()
         } else {
-            Toast.makeText(context, "Scanned: " + result.getContents(), Toast.LENGTH_LONG)
-                .show()
+
+            // deserialize text into UserInfo struct
+            try {
+                val contents = fromJson<UserInfo>(result.contents)
+                println(contents)
+                Toast.makeText(context, "Scanned: " + result.contents, Toast.LENGTH_LONG)
+                    .show()
+            } catch (e: Exception) {
+                Toast.makeText(context, "Invalid QR Code", Toast.LENGTH_LONG).show()
+            }
+
         }
     }
-    Column() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(text = "Scan")
         Button(onClick = { barcodeLauncher.launch(ScanOptions()) }) {
             Text("Scanner")
@@ -137,8 +182,17 @@ fun Scan(navController: NavController) {
 
 }
 
+// TODO: write new composable function to display user info and save to history
 @Composable
 fun History(navController: NavController) {
-    Text(text = "History")
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        Text(text = "History")
+    }
+
 }
 
