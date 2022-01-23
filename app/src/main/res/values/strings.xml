@@ -6,4 +6,6 @@
     <string name="email">Email</string>
     <string name="name">Name</string>
     <string name="phone_number">Phone Number</string>
+    <string name="view_profile">View Profile</string>
+    <string name="copied">Copied</string>
 </resources>

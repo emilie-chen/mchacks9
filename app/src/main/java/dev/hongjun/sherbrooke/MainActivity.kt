@@ -41,10 +41,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import coil.compose.rememberImagePainter
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import dev.hongjun.sherbrooke.ui.theme.ProjetSherbrookeTheme
+import kotlinx.serialization.SerializationException
 
 
 class MainActivity : ComponentActivity() {
@@ -110,6 +112,9 @@ fun MainPage() {
             composable(Screen.History.route) {
                 History(navController)
             }
+            composable(Screen.ViewProfile.route) {
+                ProfileViewer(navController = navController)
+            }
         }
     }
 }
@@ -118,10 +123,11 @@ sealed class Screen(val route: String, @StringRes val resourceId: Int) {
     object MyProfile : Screen("my_profile", R.string.my_profile)
     object Scan : Screen("scan", R.string.scan)
     object History : Screen("history", R.string.history)
+    object ViewProfile : Screen("view_profile", R.string.view_profile)
 }
 
 private val dummyUserInfo = UserInfo(
-    name = Name("First", "Last"),
+    name = Name("Dummy", "Last"),
     email = Email("first.last@example.com"),
     phoneNumber = PhoneNumber("123-456-7890"),
     socialNetworks = SocialNetworks(
@@ -174,10 +180,16 @@ fun Scan(navController: NavController) {
             // deserialize text into UserInfo struct
             try {
                 val contents = fromJson<UserInfo>(result.contents)
-                println(contents)
-                Toast.makeText(context, "Scanned: " + result.contents, Toast.LENGTH_LONG)
-                    .show()
-            } catch (e: Exception) {
+                userInfo = contents
+//                Toast.makeText(context, "Scanned: " + result.contents, Toast.LENGTH_LONG).show()
+                navController.navigate(Screen.ViewProfile.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            } catch (e: SerializationException) {
                 Toast.makeText(context, "Invalid QR Code", Toast.LENGTH_LONG).show()
             }
 
@@ -214,9 +226,11 @@ fun UserProfileEditor(navController: NavController) {
 
 }
 
+private var userInfo = dummyUserInfo
+
 // TODO : shows user info
 @Composable
-fun ProfileViewer(navController: NavController, userInfo: UserInfo) {
+fun ProfileViewer(navController: NavController) {
     Column(
         Modifier
             .verticalScroll(rememberScrollState())
@@ -316,9 +330,11 @@ fun ProfileEmailCard(email: Email) {
 @Composable
 fun ProfileGenericCopyingCard(key: String, value: String) {
     val context = LocalContext.current
+    val copied = stringResource(R.string.copied)
     Card(
         modifier = profileInfoCardModifier.clickable {
             context.copyToClipboard(value)
+            Toast.makeText(context, copied, Toast.LENGTH_SHORT).show()
         },
         elevation = profileInfoCardElevation
     ) {
@@ -424,7 +440,7 @@ fun TestCard() {
 @Composable
 fun ProfileViewerPreview() {
     ProjetSherbrookeTheme {
-        ProfileViewer(navController = rememberNavController(), userInfo = dummyUserInfo)
+        ProfileViewer(navController = rememberNavController())
 
     }
 }
