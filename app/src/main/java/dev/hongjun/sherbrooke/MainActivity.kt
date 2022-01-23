@@ -440,7 +440,7 @@ fun TestCard() {
 }
 
 @Composable
-fun ProfileModifier(navController: NavController, userInfo: UserInfo, hashMap: HashMap<String, String>) {
+fun ProfileModifier(navController: NavController, hashMap: HashMap<String, String>) {
 
     Column(
         Modifier
@@ -448,12 +448,17 @@ fun ProfileModifier(navController: NavController, userInfo: UserInfo, hashMap: H
             .padding(10.dp)
     ) {
         //ProfileNameCard(name = dummyUserInfo.name)
-        TestModifiableCard(hashMap = hashMap)
+        TestModifiableCard(hashMap = hashMap, key = stringResource(id = R.string.name))
+        TestModifiableCard(hashMap = hashMap, key = stringResource(id = R.string.email))
+        TestModifiableCard(hashMap = hashMap, key = stringResource(id = R.string.phone_number))
+        TestModifiableCard(hashMap = hashMap, key = stringResource(id = R.string.discord_tag))
+        TestModifiableCard(hashMap = hashMap, key = stringResource(id = R.string.instagram_username))
+
     }
 }
 
 @Composable
-fun TestModifiableCard(hashMap: HashMap<String, String>) {
+fun TestModifiableCard(key: String, hashMap: HashMap<String, String>) {
 
     Card(
         modifier = Modifier
@@ -468,7 +473,7 @@ fun TestModifiableCard(hashMap: HashMap<String, String>) {
             var name by rememberSaveable {
                 mutableStateOf("")
             }
-            TextFieldChanged(name = name, onNameChange = { name = it }, key="name", hashMap = hashMap)
+            TextFieldChanged(name = name, onNameChange = { name = it }, key=key, hashMap = hashMap)
 
 
         }
@@ -484,12 +489,12 @@ fun TextFieldChanged(
     hashMap: HashMap<String, String>,
     onNameChange: (String) -> Unit
 ) {
-    Text(
-        fontSize = 15.sp,
-        text = buildAnnotatedString {
-            append(name)
-        }
-    )
+//    Text(
+//        fontSize = 15.sp,
+//        text = buildAnnotatedString {
+//            append(name)
+//        }
+//    )
 
     OutlinedTextField(
         value = name,
@@ -514,15 +519,16 @@ fun ProfileViewerPreview() {
 @Composable
 fun ProfileModifierPreview() {
     val hashMap = HashMap<String, String>()
-    hashMap["name"]
-    hashMap["email"]
-    hashMap["phonenumber"]
-    hashMap["socialnetworks"]
-    hashMap["notes"]
+    hashMap[stringResource(id = R.string.name)]
+    hashMap[stringResource(id = R.string.email)]
+    hashMap[stringResource(id = R.string.phone_number)]
+    hashMap[stringResource(id = R.string.discord_tag)]
+    hashMap[stringResource(id = R.string.instagram_username)]
+    //hashMap["notes"]
 
 
     ProjetSherbrookeTheme {
-        ProfileModifier(navController = rememberNavController(), userInfo = dummyUserInfo, hashMap = hashMap)
+        ProfileModifier(navController = rememberNavController(), hashMap = hashMap)
         //TestModifiableCard()
     }
 }

@@ -8,4 +8,6 @@
     <string name="phone_number">Phone Number</string>
     <string name="view_profile">View Profile</string>
     <string name="copied">Copied</string>
+    <string name="discord_tag">Discord Tag</string>
+    <string name="instagram_username">Instagram Username</string>
 </resources>
