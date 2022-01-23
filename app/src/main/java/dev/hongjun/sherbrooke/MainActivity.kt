@@ -225,6 +225,13 @@ fun ProfileViewer(navController: NavController, userInfo: UserInfo) {
         ProfileNameCard(name = userInfo.name)
         ProfileEmailCard(email = userInfo.email)
         ProfileGenericCopyingCard(key = stringResource(R.string.phone_number), value = userInfo.phoneNumber.toString())
+        val socialNetworks = userInfo.socialNetworks
+        socialNetworks.discordTag?.let {
+            ProfileGenericCopyingCard(key = "Discord", value = it.toString())
+        }
+        socialNetworks.instagramUsername?.let {
+            ProfileGenericCopyingCard(key = "Instagram", value = it)
+        }
     }
 }
 
