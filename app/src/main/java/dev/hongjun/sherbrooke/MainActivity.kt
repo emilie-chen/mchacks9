@@ -21,6 +21,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -436,12 +439,90 @@ fun TestCard() {
     }
 }
 
+@Composable
+fun ProfileModifier(navController: NavController, userInfo: UserInfo, hashMap: HashMap<String, String>) {
+
+    Column(
+        Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(10.dp)
+    ) {
+        //ProfileNameCard(name = dummyUserInfo.name)
+        TestModifiableCard(hashMap = hashMap)
+    }
+}
+
+@Composable
+fun TestModifiableCard(hashMap: HashMap<String, String>) {
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp)
+            .clickable { },
+        elevation = 10.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(15.dp)
+        ) {
+            var name by rememberSaveable {
+                mutableStateOf("")
+            }
+            TextFieldChanged(name = name, onNameChange = { name = it }, key="name", hashMap = hashMap)
+
+
+        }
+    }
+
+
+}
+
+@Composable
+fun TextFieldChanged(
+    name: String,
+    key: String,
+    hashMap: HashMap<String, String>,
+    onNameChange: (String) -> Unit
+) {
+    Text(
+        fontSize = 15.sp,
+        text = buildAnnotatedString {
+            append(name)
+        }
+    )
+
+    OutlinedTextField(
+        value = name,
+        onValueChange = onNameChange,
+        label = { Text(text = key) }
+    )
+
+    hashMap[key] = name
+}
+
+
+
 @Preview
 @Composable
 fun ProfileViewerPreview() {
     ProjetSherbrookeTheme {
         ProfileViewer(navController = rememberNavController())
-
     }
 }
 
+@Preview
+@Composable
+fun ProfileModifierPreview() {
+    val hashMap = HashMap<String, String>()
+    hashMap["name"]
+    hashMap["email"]
+    hashMap["phonenumber"]
+    hashMap["socialnetworks"]
+    hashMap["notes"]
+
+
+    ProjetSherbrookeTheme {
+        ProfileModifier(navController = rememberNavController(), userInfo = dummyUserInfo, hashMap = hashMap)
+        //TestModifiableCard()
+    }
+}
