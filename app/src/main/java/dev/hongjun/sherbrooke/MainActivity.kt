@@ -145,7 +145,7 @@ fun MyProfile(navController: NavController) {
     val context = LocalContext.current
     val profile = getUserProfile(context) ?: run {
         setUserProfile(context, dummyUserInfo)
-        Toast.makeText(context, "User profile is null", Toast.LENGTH_LONG).show()
+        //Toast.makeText(context, "User profile is null", Toast.LENGTH_LONG).show()
         dummyUserInfo
     }
 
@@ -167,6 +167,7 @@ fun MyProfile(navController: NavController) {
                 .fillMaxSize()
                 .padding(16.dp)
         )
+        ProfileModifierPreview()
     }
 }
 
@@ -220,6 +221,7 @@ fun History(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "History")
+        ProfileViewerPreview()
     }
 }
 
@@ -241,7 +243,10 @@ fun ProfileViewer(navController: NavController) {
     ) {
         ProfileNameCard(name = userInfo.name)
         ProfileEmailCard(email = userInfo.email)
-        ProfileGenericCopyingCard(key = stringResource(R.string.phone_number), value = userInfo.phoneNumber.toString())
+        ProfileGenericCopyingCard(
+            key = stringResource(R.string.phone_number),
+            value = userInfo.phoneNumber.toString()
+        )
         val socialNetworks = userInfo.socialNetworks
         socialNetworks.discordTag?.let {
             ProfileGenericCopyingCard(key = "Discord", value = it.toString())
@@ -448,11 +453,49 @@ fun ProfileModifier(navController: NavController, hashMap: HashMap<String, Strin
             .padding(10.dp)
     ) {
         //ProfileNameCard(name = dummyUserInfo.name)
+        TestModifiableCard(hashMap = hashMap, key = stringResource(id = R.string.firstname))
         TestModifiableCard(hashMap = hashMap, key = stringResource(id = R.string.name))
         TestModifiableCard(hashMap = hashMap, key = stringResource(id = R.string.email))
         TestModifiableCard(hashMap = hashMap, key = stringResource(id = R.string.phone_number))
         TestModifiableCard(hashMap = hashMap, key = stringResource(id = R.string.discord_tag))
-        TestModifiableCard(hashMap = hashMap, key = stringResource(id = R.string.instagram_username))
+        TestModifiableCard(hashMap = hashMap, key = stringResource(id = R.string.instagram_username)
+        )
+
+        var info: UserInfo
+        var bitmap = QRCodeConverter.generateQRCodeFromString(
+            ""
+        )
+
+
+        Button(onClick = {
+
+            try{
+            info = buildUserInfo(hashMap = hashMap)
+                bitmap = QRCodeConverter.generateQRCodeFromString(
+                    toJson(
+                        info
+                    )
+                )
+            }
+            catch(e: IllegalArgumentException){
+                e.printStackTrace()
+            }
+            println(bitmap.toString())
+            //QRCodeConverter.generateQRCodeFromString(toJson(info))
+
+
+        }) {
+            Text(text = "Generate QR Code")
+            Image(
+                painter = rememberImagePainter(bitmap), contentDescription = null, modifier = Modifier
+                    .clip(shape = RoundedCornerShape(16.dp))
+                    .height(300.dp)
+                    .fillMaxSize()
+                    .padding(16.dp)
+            )
+        }
+
+
 
     }
 }
@@ -473,7 +516,12 @@ fun TestModifiableCard(key: String, hashMap: HashMap<String, String>) {
             var name by rememberSaveable {
                 mutableStateOf("")
             }
-            TextFieldChanged(name = name, onNameChange = { name = it }, key=key, hashMap = hashMap)
+            TextFieldChanged(
+                name = name,
+                onNameChange = { name = it },
+                key = key,
+                hashMap = hashMap
+            )
 
 
         }
@@ -489,12 +537,12 @@ fun TextFieldChanged(
     hashMap: HashMap<String, String>,
     onNameChange: (String) -> Unit
 ) {
-//    Text(
-//        fontSize = 15.sp,
-//        text = buildAnnotatedString {
-//            append(name)
-//        }
-//    )
+    Text(
+        fontSize = 15.sp,
+        text = buildAnnotatedString {
+            append(name)
+        }
+    )
 
     OutlinedTextField(
         value = name,
@@ -503,9 +551,27 @@ fun TextFieldChanged(
     )
 
     hashMap[key] = name
+    //val context = LocalContext.current
+    //Toast.makeText(context, hashMap[key], Toast.LENGTH_LONG).show()
 }
 
 
+fun buildUserInfo(hashMap: HashMap<String, String>): UserInfo {
+
+    val userInfo = UserInfo(
+        name = Name(hashMap["First Name"]!!, hashMap["Name"]!!),
+        email = Email(hashMap["Email"]!!),
+        phoneNumber = PhoneNumber(hashMap["Phone Number"]!!),
+        socialNetworks = SocialNetworks(
+            discordTag = DiscordTag(hashMap["Discord Tag"]!!),
+            instagramUsername = hashMap["Instagram Username"]!!
+        ),
+        notes = ""
+
+    )
+    return userInfo
+
+}
 
 @Preview
 @Composable
@@ -520,6 +586,7 @@ fun ProfileViewerPreview() {
 fun ProfileModifierPreview() {
     val hashMap = HashMap<String, String>()
     hashMap[stringResource(id = R.string.name)]
+    hashMap[stringResource(id = R.string.firstname)]
     hashMap[stringResource(id = R.string.email)]
     hashMap[stringResource(id = R.string.phone_number)]
     hashMap[stringResource(id = R.string.discord_tag)]
