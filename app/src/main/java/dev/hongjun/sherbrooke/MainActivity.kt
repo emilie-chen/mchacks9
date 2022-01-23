@@ -1,5 +1,8 @@
 package dev.hongjun.sherbrooke
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -219,7 +222,85 @@ fun ProfileViewer(navController: NavController, userInfo: UserInfo) {
             .verticalScroll(rememberScrollState())
             .padding(10.dp)
     ) {
-        ProfileCard(userInfo = dummyUserInfo)
+        ProfileNameCard(name = dummyUserInfo.name)
+    }
+}
+
+fun Context.copyToClipboard(text: CharSequence) =
+    (getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
+        .setPrimaryClip(ClipData.newPlainText("label", text))
+
+
+val profileInfoCardModifier = Modifier
+    .fillMaxWidth()
+    .padding(8.dp)
+    .clickable {  }
+
+val profileInfoCardElevation = 10.dp
+
+@Composable
+fun ProfileNameCard(name: Name) {
+    Card(
+        modifier = profileInfoCardModifier,
+        elevation = profileInfoCardElevation
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(
+                fontSize = 15.sp,
+                text = buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            fontWeight = FontWeight.W900, color = Color(
+                                0xFF8B98FF
+                            )
+                        )
+                    ) {
+                        append("Name")
+                    }
+                }
+            )
+            Text(
+                fontSize = 22.sp,
+                text = buildAnnotatedString {
+                    append(name.toString())
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun ProfileEmailCard(email: Email) {
+    Card(
+        modifier = profileInfoCardModifier,
+        elevation = profileInfoCardElevation
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(
+                fontSize = 15.sp,
+                text = buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            fontWeight = FontWeight.W900, color = Color(
+                                0xFF8B98FF
+                            )
+                        )
+                    ) {
+                        append("Email")
+                    }
+                }
+            )
+            Text(
+                fontSize = 22.sp,
+                text = buildAnnotatedString {
+                    append(email.toString())
+                }
+            )
+        }
     }
 }
 
@@ -250,6 +331,7 @@ fun ProfileCard(userInfo: UserInfo) {
                 }
             )
             Text(
+                fontSize = 15.sp,
                 text = buildAnnotatedString {
                     append(userInfo.phoneNumber.toString())
                 }
