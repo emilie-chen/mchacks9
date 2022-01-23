@@ -222,7 +222,9 @@ fun ProfileViewer(navController: NavController, userInfo: UserInfo) {
             .verticalScroll(rememberScrollState())
             .padding(10.dp)
     ) {
-        ProfileNameCard(name = dummyUserInfo.name)
+        ProfileNameCard(name = userInfo.name)
+        ProfileEmailCard(email = userInfo.email)
+        ProfileGenericCopyingCard(key = stringResource(R.string.phone_number), value = userInfo.phoneNumber.toString())
     }
 }
 
@@ -234,7 +236,7 @@ fun Context.copyToClipboard(text: CharSequence) =
 val profileInfoCardModifier = Modifier
     .fillMaxWidth()
     .padding(8.dp)
-    .clickable {  }
+    .clickable { }
 
 val profileInfoCardElevation = 10.dp
 
@@ -257,7 +259,7 @@ fun ProfileNameCard(name: Name) {
                             )
                         )
                     ) {
-                        append("Name")
+                        append(stringResource(R.string.name))
                     }
                 }
             )
@@ -290,7 +292,7 @@ fun ProfileEmailCard(email: Email) {
                             )
                         )
                     ) {
-                        append("Email")
+                        append(stringResource(R.string.email))
                     }
                 }
             )
@@ -298,6 +300,42 @@ fun ProfileEmailCard(email: Email) {
                 fontSize = 22.sp,
                 text = buildAnnotatedString {
                     append(email.toString())
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun ProfileGenericCopyingCard(key: String, value: String) {
+    val context = LocalContext.current
+    Card(
+        modifier = profileInfoCardModifier.clickable {
+            context.copyToClipboard(value)
+        },
+        elevation = profileInfoCardElevation
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp),
+        ) {
+            Text(
+                fontSize = 15.sp,
+                text = buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            fontWeight = FontWeight.W900, color = Color(
+                                0xFF8B98FF
+                            )
+                        )
+                    ) {
+                        append(key)
+                    }
+                }
+            )
+            Text(
+                fontSize = 22.sp,
+                text = buildAnnotatedString {
+                    append(value)
                 }
             )
         }

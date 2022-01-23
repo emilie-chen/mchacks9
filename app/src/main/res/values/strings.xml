@@ -3,4 +3,7 @@
     <string name="my_profile">My Profile</string>
     <string name="scan">Scan</string>
     <string name="history">History</string>
+    <string name="email">Email</string>
+    <string name="name">Name</string>
+    <string name="phone_number">Phone Number</string>
 </resources>
