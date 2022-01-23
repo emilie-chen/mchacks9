@@ -219,8 +219,41 @@ fun ProfileViewer(navController: NavController, userInfo: UserInfo) {
             .verticalScroll(rememberScrollState())
             .padding(10.dp)
     ) {
-        repeat(10) {
-            TestCard()
+        ProfileCard(userInfo = dummyUserInfo)
+    }
+}
+
+@Composable
+fun ProfileCard(userInfo: UserInfo) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable { },
+        elevation = 10.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(
+                fontSize = 22.sp,
+                text = buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            fontWeight = FontWeight.W900, color = Color(
+                                0xFF8B98FF
+                            )
+                        )
+                    ) {
+                        append(userInfo.name.toString())
+                    }
+                }
+            )
+            Text(
+                text = buildAnnotatedString {
+                    append(userInfo.phoneNumber.toString())
+                }
+            )
         }
     }
 }
@@ -230,17 +263,18 @@ fun TestCard() {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp)
+            .padding(8.dp)
             .clickable { },
         elevation = 10.dp
     ) {
         Column(
-            modifier = Modifier.padding(15.dp)
+            modifier = Modifier.padding(8.dp)
         ) {
             Text(
                 buildAnnotatedString {
                     append("welcome to ")
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.W900, color = Color(0xFF4552B8))
+                    withStyle(
+                        style = SpanStyle(fontWeight = FontWeight.W900, color = Color(0xFF4552B8))
                     ) {
                         append("Jetpack Compose Playground")
                     }
